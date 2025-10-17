@@ -1,8 +1,10 @@
 package com.cao.auth.config;
 
 import com.cao.auth.properties.RSAKeyProperties;
+import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSet;
+import com.nimbusds.jose.jwk.KeyUse;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import com.nimbusds.jose.jwk.source.JWKSource;
@@ -72,4 +74,12 @@ public class AuthorizationServerConfig {
         return new NimbusJwtEncoder(jwks);
     }
 
+    @Bean
+    JWKSet jwkSet() {
+        RSAKey.Builder builder = new RSAKey.Builder(rsaKeyProperties.publicKey())
+                .keyUse(KeyUse.SIGNATURE)
+                .algorithm(JWSAlgorithm.RS256)
+                .keyID("public-key-id");
+        return new JWKSet(builder.build());
+    }
 }
