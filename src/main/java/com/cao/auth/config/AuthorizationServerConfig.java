@@ -27,6 +27,7 @@ import org.springframework.security.oauth2.server.authorization.token.JwtEncodin
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenCustomizer;
 import org.springframework.security.web.SecurityFilterChain;
 
+import java.util.Set;
 import java.util.UUID;
 
 @Configuration
@@ -48,34 +49,38 @@ public class AuthorizationServerConfig {
     @Bean
     RegisteredClientRepository registeredClientRepository() {
 
-        RegisteredClient client1 = RegisteredClient.withId(UUID.randomUUID().toString())
-                .clientName("John")
-                .clientId("client1")
+        RegisteredClient webClient = RegisteredClient.withId(UUID.randomUUID().toString())
+                .clientId("web-client")
                 .clientSecret("{noop}password1")
                 .scope("read")
                 .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
                 .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_POST)
                 .build();
 
-        RegisteredClient client2 = RegisteredClient.withId(UUID.randomUUID().toString())
-                .clientName("Mary")
-                .clientId("client2")
+        RegisteredClient apiClient = RegisteredClient.withId(UUID.randomUUID().toString())
+                .clientId("api-client")
                 .clientSecret("{noop}password2")
                 .scope("write")
+                .scope("read")
                 .authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
                 .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_POST)
                 .build();
 
-        return new InMemoryRegisteredClientRepository(client1, client2);
+        return new InMemoryRegisteredClientRepository(webClient, apiClient);
     }
 
     @Bean
     OAuth2TokenCustomizer<JwtEncodingContext> tokenCustomizer() {
         return context -> {
             if (OAuth2TokenType.ACCESS_TOKEN.equals(context.getTokenType())) {
-                RegisteredClient client = context.getRegisteredClient();
-                JwtClaimsSet.Builder builder = context.getClaims();
-                builder.issuer("carlo");
+                JwtClaimsSet.Builder claims = context.getClaims();
+
+                claims.issuer("http://localhost:8080");
+
+                Set<String> scopes = context.getAuthorizedScopes();
+                if (scopes != null && !scopes.isEmpty()) {
+                    claims.claim("scope", String.join(" ", scopes));
+                }
             }
         };
     }
