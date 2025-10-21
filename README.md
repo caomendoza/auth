@@ -1,26 +1,45 @@
-# Auth Service (Spring Authorization Server)
+# 🔐 Auth Service — Spring Authorization Server
 
-This microservice acts as the OAuth2 Authorization Server, issuing JWT access tokens and exposing a JWKS endpoint for public key verification. It supports the `client_credentials` grant type and is designed for secure, scalable authentication in a microservice architecture.
+⚠️ **Status: In Progress**
+> This project is currently under development. Hopefully I can finish it soon :)
 
-## 🔐 Features
+## 🎯 Project Intent
 
-- OAuth2 Authorization Server using Spring Authorization Server
-- JWT access token issuance with RS256 signature
-- JWKS endpoint at `/.well-known/jwks.json` for public key discovery
-- In-memory registered clients with scoped access (`read`, `write`)
-- Custom JWT claims (issuer: `carlo`)
-- RSA key pair loaded via `RSAKeyProperties`
+The intent of this microservice is to **abstract the authentication and authorization layer** for applications. By centralizing token issuance, client registration, and public key exposure, it allows downstream services to delegate security concerns and focus on business logic.
 
-## 🚀 Getting Started
+This service acts as a dedicated OAuth2 Authorization Server, issuing JWT access tokens and exposing a JWKS endpoint for resource servers to validate signatures. It is designed to be modular, standards-compliant, and extensible for enterprise-grade identity flows.
+
+## 🚀 Features
+
+- OAuth2 Authorization Server using `spring-boot-starter-oauth2-authorization-server`
+- Supports `client_credentials` grant type
+- JWT access tokens signed with RSA private key
+- Custom token claims (`scope`, `issuer`)
+- JWKS endpoint at `/.well-known/jwks.json`
+- In-memory registered clients
+- RSA key configuration via `application.yml` or environment variables
+
+---
+
+## 🧱 Tech Stack
+
+- Java 17
+- Spring Boot 3.5.6
+- Spring Authorization Server
+- Nimbus JOSE + JWT
+- H2 (runtime only)
+- Maven
+
+## 🛠️ Getting Started
 
 ### Prerequisites
 
 - Java 17+
-- Maven or Gradle
-- Spring Boot 3.x
+- Maven 3.8+
+- RSA key pair (public/private)
 
-### Run the service
+### 1. Clone the project
 
 ```bash
-./mvnw spring-boot:run
-
+git clone https://github.com/your-org/auth-service.git
+cd auth-service
